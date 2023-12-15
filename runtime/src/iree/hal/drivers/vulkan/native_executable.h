@@ -15,6 +15,11 @@
 #include "iree/hal/api.h"
 #include "iree/hal/drivers/vulkan/handle_util.h"
 
+// flatcc schemas:
+#include "iree/base/internal/flatcc/parsing.h"
+#include "iree/schemas/pim_executable_def_reader.h"
+#include "iree/schemas/pim_executable_def_verifier.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
@@ -29,8 +34,7 @@ typedef struct iree_hal_vulkan_source_location_t {
 // IREE executable. Each of the pipelines will share the same shader module
 // and just differs by the entry point into the shader module they reference.
 iree_status_t iree_hal_vulkan_native_executable_create(
-    iree::hal::vulkan::VkDeviceHandle* logical_device,
-    VkPipelineCache pipeline_cache,
+    iree_allocator_t host_allocator,
     const iree_hal_executable_params_t* executable_params,
     iree_hal_executable_t** out_executable);
 
@@ -44,6 +48,12 @@ void iree_hal_vulkan_native_executable_entry_point_source_location(
 iree_status_t iree_hal_vulkan_native_executable_pipeline_for_entry_point(
     iree_hal_executable_t* executable, iree_host_size_t entry_ordinal,
     VkPipeline* out_pipeline_handle);
+
+flatbuffers_uint64_vec_t iree_hal_pim_executable_cmd_get(iree_hal_executable_t* base_executable);
+
+int iree_hal_pim_executable_cmd_len(iree_hal_executable_t* base_executable);
+
+
 
 #ifdef __cplusplus
 }  // extern "C"

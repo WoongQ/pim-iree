@@ -595,6 +595,7 @@ iree_status_t iree_hal_create_device_from_flags(
   } else {
     // Exactly one device specified.
     device_uri = list.values[0];
+    //device_uri = IREE_SV("newton");
   }
 
   IREE_TRACE_ZONE_BEGIN(z0);

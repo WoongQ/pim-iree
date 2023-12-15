@@ -32,6 +32,21 @@ iree_status_t iree_tooling_parse_to_variant_list(
     iree_host_size_t input_strings_count, iree_allocator_t host_allocator,
     iree_vm_list_t** out_list);
 
+// HS debug function
+iree_hal_buffer_view_t* iree_tooling_pim_alloc_data(
+    iree_hal_allocator_t* device_allocator,
+    void* input_data, int shape_0, int shape_1, int shape_2, int tensor_rank
+    );
+
+iree_status_t iree_pim_read_buffer_view(
+//iree_hal_buffer_view_t* iree_pim_read_buffer_view(
+    iree_vm_list_t* result_list);
+
+
+iree_status_t iree_tooling_pim_input_push(
+    iree_hal_buffer_view_t* input_view,
+    iree_vm_list_t** out_list);
+
 // Appends fences to |list| if the invocation model of |function| requires them.
 // If no |wait_fence| is provided then the invocation will begin immediately.
 // The caller must wait on the returned |out_signal_fence| before accessing the

@@ -17,6 +17,9 @@
 #include "iree/modules/hal/module.h"
 #include "iree/tooling/numpy_io.h"
 
+// library for sdk random
+
+
 static iree_status_t iree_allocate_and_copy_cstring_from_view(
     iree_allocator_t allocator, iree_string_view_t view, char** cstring) {
   IREE_RETURN_IF_ERROR(
@@ -457,6 +460,105 @@ static iree_status_t iree_tooling_output_variant(
 
   fclose(file);
   return status;
+}
+
+//HS function
+iree_hal_buffer_view_t* iree_tooling_pim_alloc_data(
+    iree_hal_allocator_t* device_allocator,
+    void* input_data, int shape_0, int shape_1, int shape_2, int tensor_rank
+    ) {
+  
+  iree_hal_buffer_view_t* input_view = NULL;
+
+  if (tensor_rank ==3){
+    iree_hal_dim_t shape[3] = {0, 0, 0};
+
+    shape[0] = shape_0;
+    shape[1] = shape_1;
+    shape[2] = shape_2;
+
+    int tensor_shape[3] = {shape_0, shape_1, shape_2};
+
+    IREE_CHECK_OK(iree_hal_buffer_view_allocate_buffer(
+      device_allocator, IREE_ARRAYSIZE(shape),
+      shape, IREE_HAL_ELEMENT_TYPE_FLOAT_32,
+      IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
+      (iree_hal_buffer_params_t){
+          .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
+          .access = IREE_HAL_MEMORY_ACCESS_WRITE,
+          .usage = IREE_HAL_BUFFER_USAGE_DEFAULT,
+          
+          .tensor_rank = tensor_rank,
+          .tensor_shape = tensor_shape
+          
+      },
+      iree_make_const_byte_span(input_data, sizeof(input_data)), &input_view));
+
+    return input_view;
+  }
+  else {
+    iree_hal_dim_t shape[2] = {0, 0};
+
+    shape[0] = shape_0;
+    shape[1] = shape_1;
+
+    int tensor_shape[3] = {shape_0, shape_1, shape_2};
+
+    IREE_CHECK_OK(iree_hal_buffer_view_allocate_buffer(
+      device_allocator, IREE_ARRAYSIZE(shape),
+      shape, IREE_HAL_ELEMENT_TYPE_FLOAT_32,
+      IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
+      (iree_hal_buffer_params_t){
+          .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
+          .access = IREE_HAL_MEMORY_ACCESS_WRITE,
+          .usage = IREE_HAL_BUFFER_USAGE_DEFAULT,
+          
+          .tensor_rank = tensor_rank,
+          .tensor_shape = tensor_shape
+      },
+      iree_make_const_byte_span(input_data, sizeof(input_data)), &input_view));
+
+    return input_view;
+  }
+}
+
+iree_status_t iree_tooling_pim_input_push(
+    iree_hal_buffer_view_t* input_view,
+    iree_vm_list_t** out_list) {
+
+  iree_vm_ref_t input_view_ref = iree_hal_buffer_view_move_ref(input_view);
+  
+  IREE_CHECK_OK(iree_vm_list_push_ref_move(*out_list, &input_view_ref));
+
+  return iree_ok_status();
+}
+
+iree_status_t iree_pim_read_buffer_view(
+//iree_hal_buffer_view_t* iree_pim_read_buffer_view(
+    iree_vm_list_t* result_list) {
+
+  iree_vm_variant_t variant = iree_vm_variant_empty();
+  iree_vm_list_get_variant(result_list, 0, &variant);
+
+  iree_hal_buffer_view_t* buffer_view =
+          iree_hal_buffer_view_deref(variant.ref);
+
+  iree_hal_buffer_mapping_t buffer_mapping = {{0}};
+  IREE_RETURN_IF_ERROR(iree_hal_buffer_map_range(
+      iree_hal_buffer_view_buffer(buffer_view), IREE_HAL_MAPPING_MODE_SCOPED,
+      IREE_HAL_MEMORY_ACCESS_READ, 0, IREE_WHOLE_BUFFER, &buffer_mapping));
+  
+  printf("\n ----- read PiM buffer ------ \n");
+  printf("\n ----- Buffer_length = %lu \n", iree_hal_buffer_view_byte_length(buffer_view)/4);
+
+  for(int i=0;i<iree_hal_buffer_view_byte_length(buffer_view)/4;i++){
+    printf(" %8.02f |", *(float*)(buffer_mapping.contents.data+4*i));
+
+    if(i%16==15) printf("\n");
+  }
+
+  return iree_ok_status();
+  //return buffer_view;
 }
 
 iree_status_t iree_tooling_output_variant_list(

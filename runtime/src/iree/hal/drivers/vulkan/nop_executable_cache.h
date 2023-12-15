@@ -19,7 +19,7 @@ extern "C" {
 // This is useful to isolate pipeline caching behavior and verify compilation
 // behavior.
 iree_status_t iree_hal_vulkan_nop_executable_cache_create(
-    iree::hal::vulkan::VkDeviceHandle* logical_device,
+    iree_allocator_t host_allocator,
     iree_string_view_t identifier,
     iree_hal_executable_cache_t** out_executable_cache);
 

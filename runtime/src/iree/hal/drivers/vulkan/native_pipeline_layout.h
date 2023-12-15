@@ -25,7 +25,7 @@ extern "C" {
 
 // Creates a native Vulkan VkDescriptorSetLayout object.
 iree_status_t iree_hal_vulkan_native_descriptor_set_layout_create(
-    iree::hal::vulkan::VkDeviceHandle* logical_device,
+    iree::hal::vulkan::VkDeviceHandle* logical_device, iree_allocator_t host_allocator,
     iree_hal_descriptor_set_layout_flags_t flags,
     iree_host_size_t binding_count,
     const iree_hal_descriptor_set_layout_binding_t* bindings,
@@ -42,7 +42,7 @@ VkDescriptorSetLayout iree_hal_vulkan_native_descriptor_set_layout_handle(
 // Creates a VkPipelineLayout-based pipeline layout composed of one or more
 // descriptor set layouts.
 iree_status_t iree_hal_vulkan_native_pipeline_layout_create(
-    iree::hal::vulkan::VkDeviceHandle* logical_device,
+    iree_allocator_t host_allocator,
     iree_host_size_t push_constant_count, iree_host_size_t set_layout_count,
     iree_hal_descriptor_set_layout_t* const* set_layouts,
     iree_hal_pipeline_layout_t** out_pipeline_layout);

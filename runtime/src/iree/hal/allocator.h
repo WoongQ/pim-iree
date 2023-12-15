@@ -131,6 +131,22 @@ typedef struct iree_hal_buffer_params_t {
   // If 0 then the alignment will be decided by the allocator based on optimal
   // device parameters.
   iree_device_size_t min_alignment;
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  //                                                                                   //
+  //   mem_loc table     :  true = DRAM , false = GPR                                  //
+  //                                                                                   //
+  //   data_paral table  :  distribute = 0, row-wise = 1, col-wise = 2, head-wise = 3  //
+  //                                                                                   //
+  //   meta_shape        :  rank 2  or  rank 3                                         //   
+  //                                                                                   //  
+  //   meta_type         :  Input = 0, Bias = 1, Weight = 2, key = 3, value = 4        //
+  //                                                                                   //
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+  int tensor_rank;
+  int *tensor_shape;
+  
 } iree_hal_buffer_params_t;
 
 // Canonicalizes |params| fields when zero initialization is used.

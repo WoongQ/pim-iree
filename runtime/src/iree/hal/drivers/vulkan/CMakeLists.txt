@@ -10,35 +10,26 @@
 
 iree_add_all_subdirs()
 
+# include PIM-SDK directories
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../PIM-sdk")
+
 iree_cc_library(
   NAME
     vulkan
   HDRS
     "api.h"
-    "vulkan_device.h"
-    "vulkan_driver.h"
+    "PIM_device.h"
+    "PIM_driver.h"
   SRCS
     "api.cc"
-    "builtin_executables.cc"
-    "builtin_executables.h"
-    "command_queue.h"
-    "debug_reporter.cc"
-    "debug_reporter.h"
-    "descriptor_pool_cache.cc"
-    "descriptor_pool_cache.h"
-    "descriptor_set_arena.cc"
-    "descriptor_set_arena.h"
+    "PIM_allocator.cc"
+    "PIM_allocator.h"
+    "PIM_buffer.cc"
+    "PIM_buffer.h"
+    "PIM_device.cc"
+    "PIM_driver.cc"
     "direct_command_buffer.cc"
     "direct_command_buffer.h"
-    "direct_command_queue.cc"
-    "direct_command_queue.h"
-    "extensibility_util.cc"
-    "extensibility_util.h"
-    "handle_util.h"
-    "internal_vk_mem_alloc.cc"
-    "internal_vk_mem_alloc.h"
-    "native_event.cc"
-    "native_event.h"
     "native_executable.cc"
     "native_executable.h"
     "native_pipeline_layout.cc"
@@ -47,17 +38,14 @@ iree_cc_library(
     "native_semaphore.h"
     "nop_executable_cache.cc"
     "nop_executable_cache.h"
+    "vulkan_headers.h"
+    "extensibility_util.cc"
+    "extensibility_util.h"
+    "handle_util.h"
     "status_util.c"
     "status_util.h"
     "tracing.cc"
     "tracing.h"
-    "vma_allocator.cc"
-    "vma_allocator.h"
-    "vma_buffer.cc"
-    "vma_buffer.h"
-    "vulkan_device.cc"
-    "vulkan_driver.cc"
-    "vulkan_headers.h"
   DEPS
     ::dynamic_symbols
     Vulkan::Headers
@@ -69,15 +57,15 @@ iree_cc_library(
     iree::base::internal::synchronization
     iree::base::tracing
     iree::hal
-    iree::hal::drivers::vulkan::builtin
     iree::hal::drivers::vulkan::util::arena
     iree::hal::drivers::vulkan::util::intrusive_list
     iree::hal::drivers::vulkan::util::ref_ptr
     iree::hal::utils::buffer_transfer
     iree::hal::utils::resource_set
     iree::hal::utils::semaphore_base
-    iree::schemas::spirv_executable_def_c_fbs
+    iree::schemas::pim_executable_def_c_fbs
     vulkan_memory_allocator
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../PIM-sdk/libpim.so.0.0.0"
   PUBLIC
 )
 

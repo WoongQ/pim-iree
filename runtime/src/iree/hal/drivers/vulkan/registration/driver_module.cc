@@ -44,53 +44,12 @@ static iree_status_t iree_hal_vulkan_create_driver_with_flags(
     iree_hal_driver_t** out_driver) {
   IREE_TRACE_SCOPE();
 
-  // Setup driver options from flags. We do this here as we want to enable other
-  // consumers that may not be using modules/command line flags to be able to
-  // set their options however they want.
   iree_hal_vulkan_driver_options_t driver_options;
   iree_hal_vulkan_driver_options_initialize(&driver_options);
-
-// TODO(benvanik): make this a flag - it's useful for testing the same binary
-// against multiple versions of Vulkan.
-#if defined(IREE_PLATFORM_ANDROID)
-  // TODO(#4494): always enable 1.2
-  driver_options.api_version = VK_API_VERSION_1_1;
-#else
-  driver_options.api_version = VK_API_VERSION_1_2;
-#endif  // IREE_PLATFORM_ANDROID
-
-  if (FLAG_vulkan_validation_layers) {
-    driver_options.requested_features |=
-        IREE_HAL_VULKAN_FEATURE_ENABLE_VALIDATION_LAYERS;
-  }
-  if (FLAG_vulkan_debug_utils) {
-    driver_options.requested_features |=
-        IREE_HAL_VULKAN_FEATURE_ENABLE_DEBUG_UTILS;
-    driver_options.debug_verbosity = FLAG_vulkan_debug_verbosity;
-  }
-  if (FLAG_vulkan_tracing) {
-    driver_options.requested_features |= IREE_HAL_VULKAN_FEATURE_ENABLE_TRACING;
-  }
-
-  if (FLAG_vulkan_dedicated_compute_queue) {
-    driver_options.device_options.flags |=
-        IREE_HAL_VULKAN_DEVICE_FLAG_DEDICATED_COMPUTE_QUEUE;
-  }
-  if (FLAG_vulkan_large_heap_block_size) {
-    driver_options.device_options.large_heap_block_size =
-        FLAG_vulkan_large_heap_block_size;
-  }
-
-  // Load the Vulkan library. This will fail if the library cannot be found or
-  // does not have the expected functions.
-  iree_hal_vulkan_syms_t* syms = NULL;
-  IREE_RETURN_IF_ERROR(
-      iree_hal_vulkan_syms_create_from_system_loader(host_allocator, &syms));
-
+  
   iree_status_t status = iree_hal_vulkan_driver_create(
-      identifier, &driver_options, syms, host_allocator, out_driver);
+      identifier, &driver_options, host_allocator, out_driver);
 
-  iree_hal_vulkan_syms_release(syms);
   return status;
 }
 
@@ -99,8 +58,8 @@ static iree_status_t iree_hal_vulkan_driver_factory_enumerate(
     const iree_hal_driver_info_t** out_driver_infos) {
   // NOTE: we could query supported vulkan versions or featuresets here.
   static const iree_hal_driver_info_t driver_infos[1] = {{
-      /*driver_name=*/iree_make_cstring_view("vulkan"),
-      /*full_name=*/iree_make_cstring_view("Vulkan 1.x (dynamic)"),
+      /*driver_name=*/iree_make_cstring_view("PIM"),
+      /*full_name=*/iree_make_cstring_view("{PIM_SDK} driver"),
   }};
   *out_driver_info_count = IREE_ARRAYSIZE(driver_infos);
   *out_driver_infos = driver_infos;
@@ -110,7 +69,7 @@ static iree_status_t iree_hal_vulkan_driver_factory_enumerate(
 static iree_status_t iree_hal_vulkan_driver_factory_try_create(
     void* self, iree_string_view_t driver_name, iree_allocator_t host_allocator,
     iree_hal_driver_t** out_driver) {
-  if (!iree_string_view_equal(driver_name, IREE_SV("vulkan"))) {
+  if (!iree_string_view_equal(driver_name, IREE_SV("PIM"))) {
     return iree_make_status(IREE_STATUS_UNAVAILABLE,
                             "no driver '%.*s' is provided by this factory",
                             (int)driver_name.size, driver_name.data);

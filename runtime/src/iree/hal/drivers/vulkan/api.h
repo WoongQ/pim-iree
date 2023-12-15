@@ -175,6 +175,7 @@ typedef struct iree_hal_vulkan_device_options_t {
   iree_device_size_t large_heap_block_size;
 } iree_hal_vulkan_device_options_t;
 
+
 IREE_API_EXPORT void iree_hal_vulkan_device_options_initialize(
     iree_hal_vulkan_device_options_t* out_options);
 
@@ -252,7 +253,7 @@ IREE_API_EXPORT void iree_hal_vulkan_driver_options_initialize(
 IREE_API_EXPORT iree_status_t iree_hal_vulkan_driver_create(
     iree_string_view_t identifier,
     const iree_hal_vulkan_driver_options_t* options,
-    iree_hal_vulkan_syms_t* syms, iree_allocator_t host_allocator,
+    iree_allocator_t host_allocator,
     iree_hal_driver_t** out_driver);
 
 // Creates a Vulkan HAL driver that shares an existing VkInstance.

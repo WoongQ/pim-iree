@@ -19,7 +19,7 @@ extern "C" {
 
 // Creates a timeline semaphore implemented using the native VkSemaphore type.
 iree_status_t iree_hal_vulkan_native_semaphore_create(
-    iree::hal::vulkan::VkDeviceHandle* logical_device, uint64_t initial_value,
+    iree_allocator_t host_allocator, uint64_t initial_value,
     iree_hal_semaphore_t** out_semaphore);
 
 // Returns true if |semaphore| is a Vulkan native semaphore.
